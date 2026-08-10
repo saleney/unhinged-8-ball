@@ -108,7 +108,7 @@
 
   .ball {
     position: relative;
-    z-index: 3;
+    z-index: 10;
     width: 76%;
     aspect-ratio: 1;
     border-radius: 50%;
@@ -136,6 +136,7 @@
   }
 
   .ball-stage::after {
+    z-index: 0;
     content: "";
     position: absolute;
     left: 50%;
@@ -173,48 +174,50 @@
     left: 50%;
     top: 53%;
     transform: translate(-50%, -50%);
-    width: 50%;
+    width: 57%;
     aspect-ratio: 1;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .window::before {
+    content: "";
+    position: absolute;
+    inset: 0;
     background: #09090d;
     clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
     box-shadow: inset 0 0 18px rgba(0,0,0,.9);
-    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
   }
 
   .answer {
     position: absolute;
-    top: 36%;
-    left: 27%;
-    width: 46%;
-    height: 36%;
+    top: 44%;
+    left: 24%;
+    width: 52%;
+    height: 28%;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: #fff;
-    font-size: clamp(12px, 2.7vw, 20px);
+    font-size: 18px;
     line-height: 1.03;
     font-weight: 950;
-    letter-spacing: -.02em;
+    letter-spacing: -.025em;
     text-transform: uppercase;
-    overflow: hidden;
+    overflow: visible;
     overflow-wrap: anywhere;
     word-break: break-word;
+    hyphens: none;
     text-shadow: 0 0 12px rgba(255,255,255,.22);
-  }
-
-  .answer.long {
-    font-size: clamp(9px, 2vw, 14px);
-    line-height: 1.02;
-  }
-
-  .answer.very-long {
-    font-size: clamp(7px, 1.5vw, 11px);
-    line-height: 1.01;
+    z-index: 20;
+    padding: 2px;
   }
 
   .answer.reveal {
@@ -394,11 +397,13 @@
   }
 
   @media (max-width: 560px) {
-    .app { padding-top: 25px; }
-    .ball-stage { width: 94vw; margin-top: 4px; }
-    .panel { border-radius: 20px; padding: 14px; }
-    .buttons { grid-template-columns: 1fr; }
-    .instructions { margin-bottom: 16px; }
+    .answer {
+      top: 43%;
+      left: 22%;
+      width: 56%;
+      height: 29%;
+      font-size: 14px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -413,17 +418,17 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 100%;
-    height: 100%;
+    width: 118%;
+    height: 118%;
     margin: 0;
     border-radius: 50%;
     pointer-events: none;
-    opacity: .24;
-    filter: blur(24px);
-    background: radial-gradient(ellipse at center, rgba(183,158,255,.52) 0%, rgba(120,90,190,.2) 32%, transparent 68%);
+    opacity: .22;
+    filter: blur(25px);
+    background: radial-gradient(ellipse at center, rgba(183,158,255,.5) 0%, rgba(120,90,190,.2) 34%, transparent 68%);
     mix-blend-mode: screen;
     transform-origin: 50% 50%;
-    z-index: 1;
+    z-index: 0;
   }
 
   .fog-a {
@@ -433,13 +438,13 @@
 
   .fog-b {
     transform: translate(-50%, -50%) rotate(35deg) scale(.82, 1.12);
-    opacity: .18;
+    opacity: .16;
     animation: fogSwirlB 4.8s ease-in-out infinite reverse;
   }
 
   .fog-c {
     transform: translate(-50%, -50%) rotate(70deg) scale(1.18, .62);
-    opacity: .14;
+    opacity: .12;
     animation: fogSwirlC 3.2s ease-in-out infinite;
   }
 
@@ -459,10 +464,11 @@
   }
 
   .ball-stage.active .fog {
-    opacity: .95;
+    opacity: .9;
     animation-duration: .28s;
-    filter: blur(12px);
+    filter: blur(14px);
     transform-origin: 50% 50%;
+    z-index: 0;
   }
 
   .ball-stage {
@@ -511,6 +517,7 @@
 
 
   .shadow-surge {
+    z-index: 0;
     position: absolute;
     left: 50%;
     bottom: 8%;
@@ -685,6 +692,25 @@
       animation-duration: 1.35s;
     }
   }
+
+  @media (max-width: 560px) {
+    .answer {
+      top: 44%;
+      left: 18%;
+      width: 64%;
+      height: 29%;
+      font-size: clamp(10px, 3vw, 15px);
+    }
+
+    .answer.long {
+      font-size: clamp(7.5px, 2.7vw, 11px);
+    }
+
+    .answer.very-long {
+      font-size: clamp(5.8px, 2.1vw, 8.5px);
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -846,27 +872,35 @@ const status = document.getElementById("status");
 
 let shaking = false;
 let lastIndex = -1;
+let lastAnswer = null;
 
 function fitAnswer() {
   answer.style.fontSize = "";
+
+  // One shared default size for the entire answer set. Only shrink when the
+  // rendered answer cannot fit inside the triangle's safe middle zone.
+  const defaultSize = window.innerWidth < 560 ? 14 : 18;
+  const minSize = window.innerWidth < 560 ? 8 : 10;
+  let size = defaultSize;
+
   answer.classList.remove("long", "very-long");
+  answer.style.fontSize = size + "px";
 
-  const length = answer.textContent.length;
-  if (length > 48) answer.classList.add("very-long");
-  else if (length > 30) answer.classList.add("long");
+  const safeWidth = answer.clientWidth - 10;
+  const safeHeight = answer.clientHeight - 8;
 
-  let size = parseFloat(getComputedStyle(answer).fontSize);
-  const minSize = window.innerWidth < 560 ? 5.5 : 7;
+  while (size > minSize) {
+    const range = document.createRange();
+    range.selectNodeContents(answer);
+    const textRect = range.getBoundingClientRect();
 
-  // Conservative dimensions inside the triangle. Keep the answer entirely
-  // inside this rectangle so no character touches the triangle edges.
-  const maxHeight = answer.clientHeight - 4;
-  const maxWidth = answer.clientWidth - 4;
+    if (
+      textRect.width <= safeWidth &&
+      textRect.height <= safeHeight
+    ) {
+      break;
+    }
 
-  while (
-    size > minSize &&
-    (answer.scrollHeight > maxHeight || answer.scrollWidth > maxWidth)
-  ) {
     size -= 0.5;
     answer.style.fontSize = size + "px";
   }
@@ -875,17 +909,180 @@ function fitAnswer() {
 function pickAnswer() {
   const useRare = Math.random() < 0.08;
   const pool = useRare ? rareAnswers : answers;
-  let index;
+
+  let result;
   do {
-    index = Math.floor(Math.random() * pool.length);
-  } while (pool.length > 1 && index === lastIndex);
-  lastIndex = index;
-  return pool[index];
+    result = pool[Math.floor(Math.random() * pool.length)];
+  } while (pool.length > 1 && result === lastAnswer);
+
+  lastAnswer = result;
+  return result;
 }
+
+
+// ---------- UNHINGED SOUND ENGINE ----------
+let audioCtx = null;
+
+function getAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function noiseBurst(duration, volume, filterFreq, type = "bandpass") {
+  const ctx = getAudio();
+  const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.8);
+  }
+
+  const source = ctx.createBufferSource();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+
+  filter.type = type;
+  filter.frequency.value = filterFreq;
+  filter.Q.value = 1.2;
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + duration);
+
+  source.buffer = buffer;
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  source.start();
+}
+
+function thump() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Short plastic knock, not a bass hit.
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(210, now);
+  osc.frequency.exponentialRampToValueAtTime(105, now + .07);
+
+  filter.type = "bandpass";
+  filter.frequency.value = 620;
+  filter.Q.value = 3;
+
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.13, now + .006);
+  gain.gain.exponentialRampToValueAtTime(.001, now + .085);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + .09);
+}
+
+function shakeSound() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Bright, irregular plastic clicks. These should sound like the ball
+  // physically rattling, rather than a low electronic buzz.
+  for (let i = 0; i < 17; i++) {
+    const t = now + i * .062 + Math.random() * .025;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc.type = i % 3 === 0 ? "square" : "triangle";
+    const base = 420 + Math.random() * 520;
+    osc.frequency.setValueAtTime(base, t);
+    osc.frequency.exponentialRampToValueAtTime(base * .55, t + .035);
+
+    filter.type = "bandpass";
+    filter.frequency.value = 850 + Math.random() * 900;
+    filter.Q.value = 2.5;
+
+    gain.gain.setValueAtTime(.0001, t);
+    gain.gain.exponentialRampToValueAtTime(.035 + Math.random() * .035, t + .004);
+    gain.gain.exponentialRampToValueAtTime(.0001, t + .045);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + .05);
+  }
+
+  // Very light high-passed air underneath the clicks.
+  noiseBurst(.9, .018, 1800, "highpass");
+}
+
+function whoosh() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Airy upward sweep with no sub-bass.
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(260, now);
+  osc.frequency.exponentialRampToValueAtTime(1050, now + .48);
+
+  filter.type = "highpass";
+  filter.frequency.setValueAtTime(350, now);
+  filter.frequency.exponentialRampToValueAtTime(900, now + .48);
+
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.045, now + .12);
+  gain.gain.exponentialRampToValueAtTime(.001, now + .55);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + .57);
+
+  noiseBurst(.5, .012, 2200, "highpass");
+}
+
+function revealSound() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Two soft tones for the "oracle speaks" moment.
+  [261.63, 392.00].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(.0001, now + i * .055);
+    gain.gain.exponentialRampToValueAtTime(.09, now + i * .055 + .025);
+    gain.gain.exponentialRampToValueAtTime(.001, now + i * .055 + .55);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now + i * .055);
+    osc.stop(now + i * .055 + .58);
+  });
+}
+
 
 function shake() {
   if (shaking) return;
   shaking = true;
+
+  // Unlock audio from the user's tap and start the physical sequence.
+  getAudio();
+  thump();
+  shakeSound();
 
   prompt.textContent = "THE BALL IS THINKING...";
   status.textContent = "FUCK IT, WE BALL.";
@@ -895,6 +1092,7 @@ function shake() {
   setTimeout(() => { status.textContent = "CHAOS IN PROGRESS."; }, 920);
 
   answer.classList.remove("reveal", "long", "very-long");
+  answer.style.opacity = "0";
   glow.classList.remove("pulse");
   stage.classList.add("active");
   ball.classList.remove("shaking");
@@ -905,6 +1103,7 @@ function shake() {
   glow.classList.add("pulse");
 
   setTimeout(() => {
+    whoosh();
     stage.classList.add("flash");
     setTimeout(() => stage.classList.remove("flash"), 160);
   }, 260);
@@ -923,7 +1122,11 @@ function shake() {
     const result = pickAnswer();
     answer.textContent = result;
     fitAnswer();
-    answer.classList.add("reveal");
+    requestAnimationFrame(() => {
+      fitAnswer();
+      answer.style.opacity = "1";
+      answer.classList.add("reveal");
+    });
     prompt.textContent = "FULL SEND AGAIN";
     status.textContent = "THE BALL HAS SPOKEN.";
 
