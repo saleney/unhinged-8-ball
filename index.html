@@ -108,7 +108,7 @@
 
   .ball {
     position: relative;
-    z-index: 20;
+    z-index: 10;
     width: 76%;
     aspect-ratio: 1;
     border-radius: 50%;
@@ -433,19 +433,19 @@
 
   .fog-a {
     transform: translate(-50%, -50%) rotate(-20deg) scale(1.12, .72);
-    animation: fogSwirlA 3.8s ease-in-out infinite;
+    animation: fogSwirlA 9s ease-in-out infinite;
   }
 
   .fog-b {
     transform: translate(-50%, -50%) rotate(35deg) scale(.82, 1.12);
     opacity: .16;
-    animation: fogSwirlB 4.8s ease-in-out infinite reverse;
+    animation: fogSwirlB 11s ease-in-out infinite reverse;
   }
 
   .fog-c {
     transform: translate(-50%, -50%) rotate(70deg) scale(1.18, .62);
     opacity: .12;
-    animation: fogSwirlC 3.2s ease-in-out infinite;
+    animation: fogSwirlC 13s ease-in-out infinite;
   }
 
   @keyframes fogSwirlA {
@@ -477,7 +477,6 @@
 
   .ball-stage.active .fog {
     opacity: .9;
-    animation-duration: .28s;
     filter: blur(14px);
     transform-origin: 50% 50%;
     z-index: 0;
