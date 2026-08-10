@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unhinged 8 Ball | Think It. Tap It. Ball.</title>
+<meta name="description" content="Think of your question. Tap the Unhinged 8 Ball. Accept your fate.">
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #08080c;
+    --panel: #111118;
+    --text: #f7f7fb;
+    --muted: #9a9aa8;
+    --accent: #9b7cff;
+    --accent2: #d6c9ff;
+  }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(112, 75, 190, .18), transparent 30%),
+      radial-gradient(circle at 50% 80%, rgba(54, 38, 105, .10), transparent 35%),
+      var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: min(920px, 100%);
+    min-height: 100vh;
+    padding: 34px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .eyebrow {
+    color: var(--accent2);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(38px, 8vw, 72px);
+    line-height: .95;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .tagline {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: clamp(15px, 2.8vw, 20px);
+  }
+
+  .ball-stage {
+    position: relative;
+    width: min(520px, 88vw);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    margin: 4px auto 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ball-glow {
+    position: absolute;
+    width: 78%;
+    height: 78%;
+    border-radius: 50%;
+    background: rgba(123, 82, 211, .16);
+    filter: blur(50px);
+    transition: opacity .35s, transform .35s;
+  }
+
+  .ball-glow.pulse {
+    animation: glowPulse 1.15s ease both;
+  }
+
+  @keyframes glowPulse {
+    0% { opacity: .45; transform: scale(.92); }
+    45% { opacity: 1; transform: scale(1.12); }
+    100% { opacity: .45; transform: scale(1); }
+  }
+
+  .ball {
+    position: relative;
+    z-index: 3;
+    width: 76%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 31% 23%, #45454f 0%, #202027 8%, #0b0b0f 28%, #020204 70%, #000 100%);
+    box-shadow:
+      inset -25px -28px 55px rgba(0,0,0,.9),
+      inset 13px 12px 25px rgba(255,255,255,.08),
+      0 28px 70px rgba(0,0,0,.75),
+      0 0 0 1px rgba(255,255,255,.06);
+    transition: transform .25s ease, filter .25s ease;
+    will-change: transform;
+  }
+
+  .ball::before {
+    content: "";
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.08), transparent 22%);
+    pointer-events: none;
+  }
+
+  .ball-stage::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    width: 54%;
+    height: 10%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,.88) 0%, rgba(0,0,0,.5) 48%, transparent 76%);
+    filter: blur(13px);
+    opacity: .82;
+    pointer-events: none;
+    z-index: 0;
+    transform-origin: center;
+  }
+
+  .ball-stage.active::after {
+    animation: shadowDance 1.35s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes shadowDance {
+    0% {
+      width: 54%;
+      opacity: .82;
+      transform: translateX(-50%) scaleX(1) scaleY(1);
+    }
+    6% {
+      width: 36%;
+      opacity: .58;
+      transform: translateX(-95%) scaleX(.72) scaleY(.7) rotate(-7deg);
+    }
+    12% {
+      width: 68%;
+      opacity: .9;
+      transform: translateX(-10%) scaleX(1.15) scaleY(1.15) rotate(8deg);
+    }
+    18% {
+      width: 30%;
+      opacity: .5;
+      transform: translateX(-120%) scaleX(.58) scaleY(.62) rotate(-10deg);
+    }
+    24% {
+      width: 72%;
+      opacity: .95;
+      transform: translateX(8%) scaleX(1.2) scaleY(1.25) rotate(11deg);
+    }
+    30% {
+      width: 27%;
+      opacity: .46;
+      transform: translateX(-130%) scaleX(.5) scaleY(.55) rotate(-12deg);
+    }
+    36% {
+      width: 76%;
+      opacity: .96;
+      transform: translateX(12%) scaleX(1.25) scaleY(1.28) rotate(12deg);
+    }
+    42% {
+      width: 25%;
+      opacity: .42;
+      transform: translateX(-135%) scaleX(.46) scaleY(.5) rotate(-13deg);
+    }
+    48% {
+      width: 78%;
+      opacity: 1;
+      transform: translateX(14%) scaleX(1.28) scaleY(1.3) rotate(13deg);
+    }
+    54% {
+      width: 28%;
+      opacity: .48;
+      transform: translateX(-125%) scaleX(.52) scaleY(.55) rotate(-11deg);
+    }
+    60% {
+      width: 72%;
+      opacity: .94;
+      transform: translateX(7%) scaleX(1.18) scaleY(1.2) rotate(10deg);
+    }
+    68% {
+      width: 34%;
+      opacity: .56;
+      transform: translateX(-90%) scaleX(.65) scaleY(.68) rotate(-7deg);
+    }
+    76% {
+      width: 64%;
+      opacity: .88;
+      transform: translateX(-3%) scaleX(1.08) scaleY(1.1) rotate(6deg);
+    }
+    84% {
+      width: 44%;
+      opacity: .68;
+      transform: translateX(-65%) scaleX(.82) scaleY(.85) rotate(-4deg);
+    }
+    92% {
+      width: 57%;
+      opacity: .78;
+      transform: translateX(-43%) scaleX(1.02) scaleY(1.02) rotate(2deg);
+    }
+    100% {
+      width: 54%;
+      opacity: .82;
+      transform: translateX(-50%) scaleX(1) scaleY(1) rotate(0);
+    }
+  }
+
+  .window {
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    aspect-ratio: 1;
+    background: #09090d;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: inset 0 0 18px rgba(0,0,0,.9);
+    overflow: hidden;
+  }
+
+  .answer {
+    position: absolute;
+    top: 36%;
+    left: 27%;
+    width: 46%;
+    height: 36%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    font-size: clamp(12px, 2.7vw, 20px);
+    line-height: 1.03;
+    font-weight: 950;
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-shadow: 0 0 12px rgba(255,255,255,.22);
+  }
+
+  .answer.long {
+    font-size: clamp(9px, 2vw, 14px);
+    line-height: 1.02;
+  }
+
+  .answer.very-long {
+    font-size: clamp(7px, 1.5vw, 11px);
+    line-height: 1.01;
+  }
+
+  .answer.reveal {
+    animation: reveal .45s ease both;
+  }
+
+  @keyframes reveal {
+    0% { opacity: 0; transform: translateY(7px); filter: blur(4px); }
+    55% { opacity: .85; transform: translateY(-1px); filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  .ball.shaking {
+    animation: violentShake 1.35s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes violentShake {
+    0%   { transform: translate3d(0,0,0) rotateZ(0) rotateX(0) rotateY(0) scale(1); }
+    5%   { transform: translate3d(-12px,-5px,0) rotateZ(-7deg) rotateX(4deg) rotateY(-5deg) scale(1.02); }
+    10%  { transform: translate3d(18px,7px,0) rotateZ(9deg) rotateX(-5deg) rotateY(7deg) scale(1.05); }
+    15%  { transform: translate3d(-25px,10px,0) rotateZ(-12deg) rotateX(6deg) rotateY(-9deg) scale(1.08); }
+    20%  { transform: translate3d(31px,-9px,0) rotateZ(15deg) rotateX(-7deg) rotateY(10deg) scale(1.1); }
+    25%  { transform: translate3d(-36px,11px,0) rotateZ(-18deg) rotateX(9deg) rotateY(-12deg) scale(1.12); }
+    30%  { transform: translate3d(40px,-12px,0) rotateZ(21deg) rotateX(-10deg) rotateY(14deg) scale(1.14); }
+    35%  { transform: translate3d(-43px,13px,0) rotateZ(-23deg) rotateX(11deg) rotateY(-15deg) scale(1.15); }
+    40%  { transform: translate3d(45px,-13px,0) rotateZ(24deg) rotateX(-12deg) rotateY(16deg) scale(1.16); }
+    45%  { transform: translate3d(-44px,12px,0) rotateZ(-24deg) rotateX(12deg) rotateY(-16deg) scale(1.16); }
+    50%  { transform: translate3d(42px,-11px,0) rotateZ(22deg) rotateX(-11deg) rotateY(15deg) scale(1.15); }
+    55%  { transform: translate3d(-38px,10px,0) rotateZ(-20deg) rotateX(10deg) rotateY(-14deg) scale(1.13); }
+    60%  { transform: translate3d(33px,-8px,0) rotateZ(17deg) rotateX(-9deg) rotateY(12deg) scale(1.11); }
+    65%  { transform: translate3d(-27px,7px,0) rotateZ(-14deg) rotateX(7deg) rotateY(-10deg) scale(1.09); }
+    70%  { transform: translate3d(21px,-6px,0) rotateZ(11deg) rotateX(-6deg) rotateY(8deg) scale(1.07); }
+    76%  { transform: translate3d(-15px,4px,0) rotateZ(-8deg) rotateX(4deg) rotateY(-6deg) scale(1.05); }
+    82%  { transform: translate3d(10px,-3px,0) rotateZ(5deg) rotateX(-3deg) rotateY(4deg) scale(1.03); }
+    88%  { transform: translate3d(-6px,2px,0) rotateZ(-3deg) rotateX(2deg) rotateY(-2deg) scale(1.02); }
+    94%  { transform: translate3d(2px,0,0) rotateZ(1deg) rotateX(0) rotateY(1deg) scale(1); }
+    100% { transform: translate3d(0,0,0) rotateZ(0) rotateX(0) rotateY(0) scale(1); }
+  }
+
+  .ball-stage:hover .ball:not(.shaking) {
+    transform: translateY(-5px) scale(1.01);
+  }
+
+  .instructions {
+    color: #777784;
+    font-size: 12px;
+    margin-top: -4px;
+    margin-bottom: 24px;
+  }
+
+  .panel {
+    width: min(680px, 100%);
+    background: rgba(17,17,24,.78);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
+    padding: 18px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  }
+
+  label {
+    display: block;
+    color: #aaaab7;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 0 8px 4px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 76px;
+    resize: vertical;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    outline: none;
+    background: #0a0a0f;
+    color: white;
+    padding: 16px;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  textarea::placeholder { color: #5f5f6b; }
+
+  textarea:focus {
+    border-color: rgba(155,124,255,.7);
+    box-shadow: 0 0 0 4px rgba(155,124,255,.1);
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  button {
+    border: 0;
+    border-radius: 14px;
+    padding: 15px 16px;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .15s ease, filter .15s ease, background .15s ease;
+  }
+
+  button:active { transform: scale(.97); }
+
+  .shake-btn {
+    color: #09090c;
+    background: linear-gradient(135deg, #e4dcff, #9677ff);
+  }
+
+  .shake-btn:hover { filter: brightness(1.08); }
+
+  .again-btn {
+    color: #e8e8ef;
+    background: #24242d;
+  }
+
+  .again-btn:hover { background: #2c2c37; }
+
+  .status {
+    min-height: 20px;
+    margin-top: 12px;
+    text-align: center;
+    color: #777784;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .history {
+    width: min(680px, 100%);
+    margin-top: 18px;
+  }
+
+  .history-title {
+    color: #686875;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin: 0 0 8px 4px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .history-item {
+    border: 1px solid rgba(255,255,255,.05);
+    background: rgba(255,255,255,.025);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .history-q {
+    color: #8b8b97;
+    font-size: 12px;
+  }
+
+  .history-a {
+    margin-top: 3px;
+    color: #e8e8ef;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 38px;
+    color: #4d4d58;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  @media (max-width: 560px) {
+    .app { padding-top: 25px; }
+    .ball-stage { width: 94vw; margin-top: 4px; }
+    .panel { border-radius: 20px; padding: 14px; }
+    .buttons { grid-template-columns: 1fr; }
+    .instructions { margin-bottom: 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+
+  .fog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 115%;
+    height: 115%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: .18;
+    filter: blur(26px);
+    background: radial-gradient(ellipse at center, rgba(183,158,255,.5) 0%, rgba(120,90,190,.18) 34%, transparent 68%);
+    mix-blend-mode: screen;
+    transform-origin: center;
+  }
+
+  .fog-a {
+    transform: translate(-50%, -50%) rotate(-20deg) scaleX(1.15);
+    animation: fogSwirlA 5s ease-in-out infinite;
+  }
+
+  .fog-b {
+    transform: translate(-50%, -50%) rotate(35deg) scaleX(.8);
+    opacity: .12;
+    animation: fogSwirlB 6.5s ease-in-out infinite reverse;
+  }
+
+  .fog-c {
+    transform: translate(-50%, -50%) rotate(70deg) scaleX(1.25);
+    opacity: .1;
+    animation: fogSwirlC 4.2s ease-in-out infinite;
+  }
+
+  @keyframes fogSwirlA {
+    0%, 100% { transform: rotate(-18deg) translate(-3%, -18%) scale(1); }
+    50% { transform: rotate(18deg) translate(5%, 14%) scale(1.18); }
+  }
+
+  @keyframes fogSwirlB {
+    0%, 100% { transform: rotate(22deg) translate(4%, 22%) scale(1); }
+    50% { transform: rotate(-25deg) translate(-8%, -12%) scale(1.22); }
+  }
+
+  @keyframes fogSwirlC {
+    0%, 100% { transform: translate(-15%, 5%) rotate(-25deg); }
+    50% { transform: translate(15%, -5%) rotate(25deg); }
+  }
+
+  .ball-stage.active .fog {
+    opacity: 1;
+    animation-duration: .3s;
+    filter: blur(10px);
+    transform-origin: center;
+  }
+
+  .ball-stage {
+    outline: none;
+  }
+
+  .tap-prompt {
+    margin-top: -7px;
+    color: #d6c9ff;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .18em;
+    text-align: center;
+    text-transform: uppercase;
+    transition: opacity .25s, transform .25s;
+  }
+
+  .status {
+    min-height: 20px;
+    margin-top: 10px;
+    color: #696976;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 36px;
+    color: #454550;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .ball-stage.impact {
+    animation: stageImpact .22s ease-in-out 3;
+  }
+
+  @keyframes stageImpact {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+
+  .shadow-surge {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    width: 28%;
+    height: 5%;
+    border-radius: 50%;
+    background: rgba(0,0,0,.62);
+    filter: blur(9px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ball-stage.active .shadow-surge {
+    opacity: .8;
+    animation: surgeShadow 1.35s ease both;
+  }
+
+  @keyframes surgeShadow {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    8% { transform: translateX(-180%) scale(.65); }
+    16% { transform: translateX(90%) scale(1.35); }
+    24% { transform: translateX(-210%) scale(.5); }
+    32% { transform: translateX(110%) scale(1.5); }
+    40% { transform: translateX(-190%) scale(.48); }
+    48% { transform: translateX(120%) scale(1.55); }
+    56% { transform: translateX(-170%) scale(.58); }
+    64% { transform: translateX(90%) scale(1.35); }
+    74% { transform: translateX(-105%) scale(.75); }
+    84% { transform: translateX(60%) scale(1.18); }
+    94% { transform: translateX(-20%) scale(.95); }
+  }
+
+
+  .energy-ring {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    width: 69%;
+    aspect-ratio: 1;
+    border: 2px solid rgba(190,165,255,.45);
+    border-radius: 50%;
+    transform: translate(-50%,-50%) scale(.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ring-one { border-style: solid; }
+  .ring-two { width: 88%; border: 2px dashed rgba(215,195,255,.3); }
+
+  .ball-stage.active .ring-one {
+    animation: energyRing 1.35s ease-out both;
+  }
+
+  .ball-stage.active .ring-two {
+    animation: energyRing 1.35s .08s ease-out both, ringSpin 1.35s linear both;
+  }
+
+  @keyframes energyRing {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.65); }
+    18% { opacity: .65; }
+    70% { opacity: .22; }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.35); }
+  }
+
+  @keyframes ringSpin {
+    from { rotate: 0deg; }
+    to { rotate: 220deg; }
+  }
+
+  .spark-field {
+    position: absolute;
+    z-index: 4;
+    inset: 8%;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .spark-field i {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(225,214,255,.9);
+    box-shadow: 0 0 10px rgba(185,155,255,.8);
+    opacity: 0;
+  }
+
+  .spark-field i:nth-child(1) { --sx: -35px; --sy: -10px; left: 12%; top: 42%; }
+  .spark-field i:nth-child(2) { --sx: -24px; --sy: -32px; left: 22%; top: 19%; }
+  .spark-field i:nth-child(3) { --sx: -4px; --sy: -42px; left: 39%; top: 8%; }
+  .spark-field i:nth-child(4) { --sx: 28px; --sy: -30px; left: 68%; top: 14%; }
+  .spark-field i:nth-child(5) { --sx: 40px; --sy: -8px; left: 84%; top: 34%; }
+  .spark-field i:nth-child(6) { --sx: 42px; --sy: 18px; left: 89%; top: 61%; }
+  .spark-field i:nth-child(7) { --sx: 28px; --sy: 34px; left: 72%; top: 83%; }
+  .spark-field i:nth-child(8) { --sx: 5px; --sy: 42px; left: 51%; top: 91%; }
+  .spark-field i:nth-child(9) { --sx: -28px; --sy: 34px; left: 27%; top: 82%; }
+  .spark-field i:nth-child(10) { --sx: -42px; --sy: 16px; left: 10%; top: 66%; }
+  .spark-field i:nth-child(11) { --sx: -28px; --sy: -8px; left: 31%; top: 35%; }
+  .spark-field i:nth-child(12) { --sx: 31px; --sy: 7px; left: 73%; top: 48%; }
+
+  .ball-stage.active .spark-field i {
+    animation: sparks 1.15s ease-out both;
+  }
+
+  .ball-stage.active .spark-field i:nth-child(2n) { animation-delay: .08s; }
+  .ball-stage.active .spark-field i:nth-child(3n) { animation-delay: .16s; }
+  .ball-stage.active .spark-field i:nth-child(5n) { animation-delay: .24s; }
+
+  @keyframes sparks {
+    0% { opacity: 0; transform: scale(.2) translate(0,0); }
+    18% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.8) translate(var(--sx, 0), var(--sy, -18px)); }
+  }
+
+
+  .ball-stage.flash::before {
+    content: "";
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    background: rgba(220,205,255,.22);
+    filter: blur(30px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  .ball-stage.active.flash::before {
+    animation: oracleFlash .12s ease-out both;
+  }
+
+  @keyframes oracleFlash {
+    0% { opacity: 0; transform: scale(.7); }
+    40% { opacity: .75; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.3); }
+  }
+
+  .ball-stage.active .ball-glow {
+    animation: glowPulse 1.35s ease-in-out both, glowFlicker 1.35s linear both;
+  }
+
+  @keyframes glowFlicker {
+    0%, 100% { filter: blur(50px); }
+    18% { filter: blur(32px); }
+    24% { filter: blur(58px); }
+    42% { filter: blur(28px); }
+    58% { filter: blur(55px); }
+    76% { filter: blur(34px); }
+  }
+
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="eyebrow">THE INTERNET'S LEAST QUALIFIED ADVISOR</div>
+    <h1>UNHINGED 8 BALL</h1>
+    <p class="tagline">Think of your question.<br>Then tap the ball.</p>
+  </header>
+
+  <section class="ball-stage" id="ballStage" aria-label="Tap the 8 Ball">
+    <div class="fog fog-a"></div>
+    <div class="fog fog-b"></div>
+    <div class="fog fog-c"></div>
+    <div class="ball-glow"></div>
+    <div class="energy-ring ring-one"></div>
+    <div class="energy-ring ring-two"></div>
+    <div class="spark-field" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="shadow-surge"></div>
+
+    <div class="ball" id="ball">
+      <div class="window">
+        <div class="answer" id="answer">8</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tap-prompt" id="tapPrompt">TAP THE BALL</div>
+  <div class="status" id="status">FUCK IT, WE BALL.</div>
+
+  <div class="footer">No wisdom. No guarantees. Just vibes.</div>
+</main>
+
+<script>
+const answers = [
+  "GIRL. STAND UP.",
+  "BE FUCKING SERIOUS.",
+  "YOU KNOW DAMN WELL.",
+  "I'M NOT ENABLING THIS.",
+  "ABSOLUTELY NOT. GO TO BED.",
+  "DELETE THE NUMBER.",
+  "BLOCKED IN THE SPIRITUAL REALM.",
+  "THAT'S BETWEEN YOU AND GOD.",
+  "ASK YOUR THERAPIST.",
+  "I'M AN ORACLE, NOT A MIRACLE WORKER.",
+  "WE'VE DISCUSSED THIS.",
+  "YOU'RE EMBARRASSING BOTH OF US.",
+  "PUT THE PHONE DOWN.",
+  "LOG OFF.",
+  "CLOSE THE APP.",
+  "NO ❤️",
+  "I HAVE CONCERNS.",
+  "THIS IS WHY I HAVE TRUST ISSUES.",
+  "YOU'RE ABOUT TO LEARN THE HARD WAY.",
+  "CHARACTER DEVELOPMENT INCOMING.",
+  "THAT SOUNDS LIKE A TERRIBLE IDEA.",
+  "I'M GOING TO PRETEND YOU DIDN'T ASK THAT.",
+  "RESPECTFULLY, WHAT THE FUCK?",
+  "YOU'RE BETTER THAN THIS.",
+  "BECAUSE APPARENTLY WE HAVE TO LEARN EVERYTHING THE HARD WAY.",
+  "I CAN'T KEEP DOING THIS WITH YOU.",
+  "YOU'RE ASKING THE WRONG BALL.",
+  "THE ANSWER IS IN YOUR NOTES APP.",
+  "CHECK YOUR OWN TEXTS.",
+  "THIS IS A 2 A.M. DECISION AND IT SHOWS.",
+  "SLEEP ON IT.",
+  "WAIT 24 HOURS.",
+  "NO DECISIONS WHILE EMOTIONAL.",
+  "YOU'RE IN YOUR DELUSIONAL ERA.",
+  "I SUPPORT THE DELUSION.",
+  "HONESTLY? SEND IT.",
+  "CHAOS APPROVED.",
+  "I DID NOT EXPECT YOU TO ASK THAT.",
+  "FASCINATING. TERRIBLE.",
+  "I'M NOT SIGNING OFF ON THIS.",
+  "YOU'RE GOING TO DO IT ANYWAY, AREN'T YOU?",
+  "FINE. FUCK IT.",
+  "MAY GOD BE WITH YOU.",
+  "GIRL WHAT.",
+  "I'M TIRED.",
+  "YOU CANNOT KEEP BRINGING ME THIS.",
+  "YOU NEED TO SIT DOWN.",
+  "THE BALL HAS CONCERNS.",
+  "I HAVE QUESTIONS TOO.",
+  "WE BOTH KNOW THE ANSWER.",
+  "YOU DID NOT COME HERE FOR THE TRUTH.",
+  "YOU CAME HERE FOR VALIDATION.",
+  "AND I'M NOT GIVING IT TO YOU.",
+  "THE 8 BALL HAS LEFT THE CHAT.",
+  "THIS IS ABOVE MY PAY GRADE.",
+  "I WOULD NOT TELL MY WORST ENEMY TO DO THIS.",
+  "ABSOLUTELY NOT, NEXT.",
+  "YOU'RE FREE TO IGNORE ME. YOU WON'T.",
+  "DO IT. I WANT TO SEE WHAT HAPPENS.",
+  "FUCK AROUND AND FIND OUT.",
+  "CONGRATULATIONS, YOU'VE CREATED A PROBLEM.",
+  "I'M SCREAMING.",
+  "OH, THIS IS GOING TO BE BAD.",
+  "NOT THE MOVE.",
+  "WHAT COULD POSSIBLY GO WRONG?",
+  "LIFE IS SHORT. MAKE QUESTIONABLE CHOICES.",
+  "YOLO, BUT WITH CONSEQUENCES.",
+  "I DIDN'T SAY IT WAS A GOOD IDEA. I SAID DO IT.",
+  "NO THOUGHTS. JUST VIBES.",
+  "THIS WILL EITHER BE ICONIC OR A TERRIBLE MISTAKE.",
+  "FUCK IT, WE BALL.",
+  "WE BALL.",
+  "SEND IT.",
+  "YOU'VE BEEN WAITING FOR PERMISSION. HERE IT IS.",
+  "I'M NOT YOUR MOM.",
+  "YOU'RE MAKING THIS MY PROBLEM NOW.",
+  "ABSOLUTELY UNHINGED. APPROVED.",
+  "I CANNOT IN GOOD CONSCIENCE RECOMMEND THIS. WHICH MEANS... PROBABLY.",
+  "I'M NOT SAYING YES. I'M ALSO NOT SAYING NO. GOOD LUCK.",
+  "THE VIBES ARE QUESTIONABLE.",
+  "THE VIBES ARE IMMACULATE. PROCEED.",
+  "THIS IS A TERRIBLE IDEA. I LOVE IT.",
+  "YOU'RE GOING TO HAVE A STORY TO TELL.",
+  "NOTHING GOOD HAPPENS AFTER MIDNIGHT.",
+  "YOU ALREADY KNOW WHAT YOU SHOULD DO.",
+  "I SAID WHAT I SAID.",
+  "NEXT QUESTION.",
+  "I REFUSE TO PARTICIPATE.",
+  "WE ARE NOT REVISITING THIS.",
+  "THERE IS NO ADULT SUPERVISION HERE.",
+  "YOU'RE ON YOUR OWN, SOLDIER.",
+  "I BELIEVE IN YOU. UNFORTUNATELY.",
+  "EMOTIONALLY? YES. LOGICALLY? ABSOLUTELY NOT.",
+  "MY SOURCES SAY: GIRL, NO.",
+  "THE ANSWER IS LOUDER THAN YOUR EXCUSES.",
+  "I'M GOING TO NEED YOU TO BE NORMAL FOR FIVE MINUTES.",
+  "YOU'RE REALLY COMMITTED TO THE BIT.",
+  "I RESPECT THE AUDACITY.",
+  "HONESTLY? ICONIC.",
+  "THIS IS HOW THE PLOT THICKENS.",
+  "CHARACTER DEVELOPMENT HAS ENTERED THE CHAT."
+];
+
+const rareAnswers = [
+  "FUCK IT, WE BALL.",
+  "THE BALL HAS CHOSEN CHAOS.",
+  "YOU'RE GOING TO DO IT. I'M JUST HERE FOR THE CONSEQUENCES.",
+  "I HAVE SEEN THE FUTURE. IT'S MESSY.",
+  "I'M CALLING THE COUNCIL.",
+  "THE PROPHECY WAS NOT PREPARED FOR THIS.",
+  "ERROR: TOO UNHINGED TO ANSWER.",
+  "THE BALL IS JUDGING YOU SILENTLY.",
+  "I'M PUTTING THIS QUESTION BACK IN THE BOX."
+];
+
+const ball = document.getElementById("ball");
+const stage = document.getElementById("ballStage");
+const answer = document.getElementById("answer");
+const glow = document.querySelector(".ball-glow");
+const prompt = document.getElementById("tapPrompt");
+const status = document.getElementById("status");
+
+let shaking = false;
+let lastIndex = -1;
+
+function fitAnswer() {
+  answer.style.fontSize = "";
+  answer.classList.remove("long", "very-long");
+
+  const length = answer.textContent.length;
+  if (length > 48) answer.classList.add("very-long");
+  else if (length > 30) answer.classList.add("long");
+
+  let size = parseFloat(getComputedStyle(answer).fontSize);
+  const minSize = window.innerWidth < 560 ? 5.5 : 7;
+
+  // Conservative dimensions inside the triangle. Keep the answer entirely
+  // inside this rectangle so no character touches the triangle edges.
+  const maxHeight = answer.clientHeight - 4;
+  const maxWidth = answer.clientWidth - 4;
+
+  while (
+    size > minSize &&
+    (answer.scrollHeight > maxHeight || answer.scrollWidth > maxWidth)
+  ) {
+    size -= 0.5;
+    answer.style.fontSize = size + "px";
+  }
+}
+
+function pickAnswer() {
+  const useRare = Math.random() < 0.08;
+  const pool = useRare ? rareAnswers : answers;
+  let index;
+  do {
+    index = Math.floor(Math.random() * pool.length);
+  } while (pool.length > 1 && index === lastIndex);
+  lastIndex = index;
+  return pool[index];
+}
+
+function shake() {
+  if (shaking) return;
+  shaking = true;
+
+  prompt.textContent = "THE BALL IS THINKING...";
+  status.textContent = "FUCK IT, WE BALL.";
+
+  setTimeout(() => { status.textContent = "OH, YOU WANT AN ANSWER?"; }, 280);
+  setTimeout(() => { status.textContent = "HOLD ON."; }, 620);
+  setTimeout(() => { status.textContent = "CHAOS IN PROGRESS."; }, 920);
+
+  answer.classList.remove("reveal", "long", "very-long");
+  glow.classList.remove("pulse");
+  stage.classList.add("active");
+  ball.classList.remove("shaking");
+  stage.classList.remove("flash");
+  void ball.offsetWidth;
+  void glow.offsetWidth;
+  ball.classList.add("shaking");
+  glow.classList.add("pulse");
+
+  setTimeout(() => {
+    stage.classList.add("flash");
+    setTimeout(() => stage.classList.remove("flash"), 160);
+  }, 260);
+
+  setTimeout(() => {
+    stage.classList.add("flash");
+    setTimeout(() => stage.classList.remove("flash"), 160);
+  }, 650);
+
+  setTimeout(() => {
+    stage.classList.add("impact");
+    setTimeout(() => stage.classList.remove("impact"), 700);
+  }, 220);
+
+  setTimeout(() => {
+    const result = pickAnswer();
+    answer.textContent = result;
+    fitAnswer();
+    answer.classList.add("reveal");
+    prompt.textContent = "TAP TO ASK AGAIN";
+    status.textContent = "THE BALL HAS SPOKEN.";
+
+    setTimeout(() => {
+      ball.classList.remove("shaking");
+      shaking = false;
+    }, 250);
+  }, 1350);
+}
+
+window.addEventListener("resize", () => {
+  if (answer.textContent !== "8") fitAnswer();
+});
+
+stage.addEventListener("click", shake);
+stage.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    shake();
+  }
+});
+</script>
+</body>
+</html>
