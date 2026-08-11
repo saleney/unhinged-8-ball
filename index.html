@@ -396,8 +396,8 @@
     text-align: center;
   }
 
-  .salene-home-link { color: var(--accent2); text-decoration: none; }
-  .salene-home-link:hover, .salene-home-link:focus-visible { text-decoration: underline; outline: none; }
+  .salene-home-link { position: fixed; z-index: 20; bottom: 14px; left: 50%; padding: 8px 11px; border: 1px solid var(--accent2); border-radius: 999px; background: var(--bg); color: var(--accent2); box-shadow: 2px 2px 0 rgba(214,201,255,.45); font-size: 11px; text-decoration: none; transform: translateX(-50%); }
+  .salene-home-link:hover, .salene-home-link:focus-visible { background: #241d3c; outline: 2px solid var(--accent2); outline-offset: 2px; }
 
   @media (max-width: 560px) {
     .answer {
