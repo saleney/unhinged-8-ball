@@ -726,6 +726,12 @@
     }
   }
 
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono&family=Fraunces:opsz,wght@9..144,700&display=swap');
+  h1 { font-family: Fraunces, Georgia, serif; letter-spacing: -.07em; }
+  .eyebrow, .tagline, .tap-prompt, .status, .footer { font-family: "DM Mono", monospace; }
+  .fog{opacity:.34;filter:blur(32px);background:radial-gradient(ellipse at 30% 40%,rgba(238,221,255,.7) 0%,rgba(158,104,255,.38) 28%,rgba(73,38,133,.18) 54%,transparent 72%);}
+  .fog-b{opacity:.24;mix-blend-mode:color-dodge}.fog-c{opacity:.2;background:radial-gradient(ellipse at 70% 62%,rgba(111,235,255,.28),rgba(132,69,231,.26) 36%,transparent 70%)}
+  .ball-stage.active .fog{opacity:1;filter:blur(19px)}
 </style>
 </head>
 <body>
@@ -1109,6 +1115,9 @@ function shake() {
   answer.classList.remove("reveal", "long", "very-long");
   answer.style.opacity = "0";
   glow.classList.remove("pulse");
+  // Reset the fog state so every click gives desktop users a fresh visible gust.
+  stage.classList.remove("active");
+  void stage.offsetWidth;
   stage.classList.add("active");
   ball.classList.remove("shaking");
   stage.classList.remove("flash");
