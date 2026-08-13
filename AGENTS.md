@@ -31,3 +31,14 @@ This is a compact, personality-driven interactive toy. Its job is to feel polish
 ## Testing
 
 For meaningful changes, verify the main interaction on small mobile, standard mobile, large mobile, and desktop. Check question entry, answer display, repeated use, animation, and any audio/fog behavior affected by the change.
+
+## Required session start
+
+Before modifying this project:
+
+1. Read this `AGENTS.md` file completely.
+2. Read the master creative constitution: https://github.com/saleney/saleney.github.io/blob/main/DESIGN.md
+3. Briefly confirm which instruction files you read.
+4. Inspect the existing implementation before proposing or making changes.
+
+Treat `AGENTS.md` as the operational instructions and the master `DESIGN.md` as the creative constitution. If either required file is unavailable, stop and tell Salene before modifying anything.
