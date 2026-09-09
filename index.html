@@ -732,6 +732,19 @@
   .fog{opacity:.34;filter:blur(32px);background:radial-gradient(ellipse at 30% 40%,rgba(238,221,255,.7) 0%,rgba(158,104,255,.38) 28%,rgba(73,38,133,.18) 54%,transparent 72%);}
   .fog-b{opacity:.24;mix-blend-mode:color-dodge}.fog-c{opacity:.2;background:radial-gradient(ellipse at 70% 62%,rgba(111,235,255,.28),rgba(132,69,231,.26) 36%,transparent 70%)}
   .ball-stage.active .fog{opacity:1;filter:blur(19px)}
+
+  /* A night edition: paper typography around the original oracle. */
+  :root { --bg: #151413; --text: #f0e9dc; --muted: #b3aa9c; --accent2: #d5a083; }
+  html, body { background: var(--bg); }
+  .app { overflow-x: clip; }
+  h1 { font-family: Georgia, serif; font-weight: 400; letter-spacing: -.055em; line-height: 1.04; }
+  .eyebrow { margin-top: 14px; font-size: 10px; font-weight: 400; letter-spacing: .14em; }
+  .tagline { font-family: Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.45; }
+  .tap-prompt { color: #d5a083; font-weight: 400; font-size: 11px; letter-spacing: .14em; }
+  .status, .footer { color: #b3aa9c; font-weight: 400; }
+  .salene-home-link { min-height: 44px; display: inline-flex; align-items: center; background: none; color: #d5a083; border: 0; border-radius: 0; box-shadow: none; padding: 8px 0; }
+  .salene-home-link:hover, .salene-home-link:focus-visible { background: none; color: #f0e9dc; text-decoration: underline; outline-color: #d5a083; }
+  .ball-stage:focus-visible { outline: 1px solid #d5a083; outline-offset: -16px; }
 </style>
 </head>
 <body>
@@ -742,7 +755,7 @@
     <p class="tagline">Think of your question.<br>Then tap the ball.</p>
   </header>
 
-  <section class="ball-stage" id="ballStage" aria-label="Tap the 8 Ball">
+  <section class="ball-stage" id="ballStage" role="button" tabindex="0" aria-label="Tap the 8 Ball">
     <div class="fog fog-a"></div>
     <div class="fog fog-b"></div>
     <div class="fog fog-c"></div>
