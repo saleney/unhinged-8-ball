@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Unhinged 8 Ball | Think It. Tap It. Ball.</title>
+<meta name="description" content="Think of your question. Tap the Unhinged 8 Ball. Accept your fate.">
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #08080c;
+    --panel: #111118;
+    --text: #f7f7fb;
+    --muted: #9a9aa8;
+    --accent: #9b7cff;
+    --accent2: #d6c9ff;
+  }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(112, 75, 190, .18), transparent 30%),
+      radial-gradient(circle at 50% 80%, rgba(54, 38, 105, .10), transparent 35%),
+      var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: min(920px, 100%);
+    min-height: 100vh;
+    padding: 34px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .eyebrow {
+    color: var(--accent2);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(38px, 8vw, 72px);
+    line-height: .95;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .tagline {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: clamp(15px, 2.8vw, 20px);
+  }
+
+  .ball-stage {
+    position: relative;
+    width: min(520px, 88vw);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    margin: 4px auto 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  .ball-glow {
+    position: absolute;
+    width: 78%;
+    height: 78%;
+    border-radius: 50%;
+    background: rgba(123, 82, 211, .16);
+    filter: blur(50px);
+    transition: opacity .35s, transform .35s;
+  }
+
+  .ball-glow.pulse {
+    animation: glowPulse 1.15s ease both;
+  }
+
+  @keyframes glowPulse {
+    0% { opacity: .45; transform: scale(.92); }
+    45% { opacity: 1; transform: scale(1.12); }
+    100% { opacity: .45; transform: scale(1); }
+  }
+
+  .ball {
+    position: relative;
+    z-index: 10;
+    width: 76%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 31% 23%, #45454f 0%, #202027 8%, #0b0b0f 28%, #020204 70%, #000 100%);
+    box-shadow:
+      inset -25px -28px 55px rgba(0,0,0,.9),
+      inset 13px 12px 25px rgba(255,255,255,.08),
+      0 28px 70px rgba(0,0,0,.75),
+      0 0 0 1px rgba(255,255,255,.06);
+    transition: transform .25s ease, filter .25s ease;
+    will-change: transform;
+  }
+
+  .ball::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.08), transparent 22%);
+    pointer-events: none;
+  }
+
+  .ball-stage::after {
+    z-index: 0;
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    width: 54%;
+    height: 10%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,.88) 0%, rgba(0,0,0,.5) 48%, transparent 76%);
+    filter: blur(13px);
+    opacity: .82;
+    pointer-events: none;
+    z-index: 0;
+    transform-origin: center;
+  }
+
+  .ball-stage.active::after {
+    animation: shadowDance 1.35s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes shadowDance {
+    0% { width: 54%; opacity: .82; transform: translateX(-50%) scaleX(1) scaleY(1); }
+    14% { width: 38%; opacity: .55; transform: translateX(-115%) scaleX(.65) scaleY(.65) rotate(-8deg); }
+    28% { width: 74%; opacity: .96; transform: translateX(15%) scaleX(1.22) scaleY(1.2) rotate(10deg); }
+    42% { width: 28%; opacity: .45; transform: translateX(-135%) scaleX(.48) scaleY(.52) rotate(-13deg); }
+    56% { width: 80%; opacity: 1; transform: translateX(18%) scaleX(1.3) scaleY(1.28) rotate(14deg); }
+    70% { width: 34%; opacity: .52; transform: translateX(-105%) scaleX(.62) scaleY(.65) rotate(-8deg); }
+    84% { width: 64%; opacity: .9; transform: translateX(2%) scaleX(1.08) scaleY(1.1) rotate(6deg); }
+    94% { width: 52%; opacity: .76; transform: translateX(-45%) scaleX(.96) scaleY(.98) rotate(-2deg); }
+    100% { width: 54%; opacity: .82; transform: translateX(-50%) scaleX(1) scaleY(1) rotate(0); }
+  }
+
+  .window {
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    transform: translate(-50%, -50%);
+    width: 57%;
+    aspect-ratio: 1;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .window::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #09090d;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    box-shadow: inset 0 0 18px rgba(0,0,0,.9);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .answer {
+    position: absolute;
+    top: 44%;
+    left: 24%;
+    width: 52%;
+    height: 28%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1.03;
+    font-weight: 950;
+    letter-spacing: -.025em;
+    text-transform: uppercase;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: none;
+    text-shadow: 0 0 12px rgba(255,255,255,.22);
+    z-index: 20;
+    padding: 2px;
+  }
+
+  .answer.reveal {
+    animation: reveal .45s ease both;
+  }
+
+  @keyframes reveal {
+    0% { opacity: 0; transform: translateY(7px); filter: blur(4px); }
+    55% { opacity: .85; transform: translateY(-1px); filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  .ball.shaking {
+    animation: violentShake 1.35s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes violentShake {
+    0%   { transform: translate3d(0,0,0) rotateZ(0deg) rotateX(0deg) rotateY(0deg) scale(1); }
+    7%   { transform: translate3d(-24px,-10px,0) rotateZ(-8deg) rotateX(5deg) rotateY(-5deg) scale(1.02); }
+    14%  { transform: translate3d(32px,8px,0) rotateZ(10deg) rotateX(-6deg) rotateY(7deg) scale(1.04); }
+    21%  { transform: translate3d(-48px,18px,0) rotateZ(-14deg) rotateX(8deg) rotateY(-10deg) scale(1.06); }
+    28%  { transform: translate3d(54px,-15px,0) rotateZ(17deg) rotateX(-9deg) rotateY(12deg) scale(1.08); }
+    35%  { transform: translate3d(-62px,13px,0) rotateZ(-20deg) rotateX(11deg) rotateY(-14deg) scale(1.1); }
+    42%  { transform: translate3d(68px,-18px,0) rotateZ(23deg) rotateX(-12deg) rotateY(16deg) scale(1.11); }
+    49%  { transform: translate3d(-70px,20px,0) rotateZ(-25deg) rotateX(13deg) rotateY(-18deg) scale(1.12); }
+    56%  { transform: translate3d(72px,-18px,0) rotateZ(27deg) rotateX(-14deg) rotateY(19deg) scale(1.12); }
+    63%  { transform: translate3d(-65px,15px,0) rotateZ(-24deg) rotateX(12deg) rotateY(-17deg) scale(1.1); }
+    70%  { transform: translate3d(56px,-12px,0) rotateZ(21deg) rotateX(-10deg) rotateY(15deg) scale(1.08); }
+    77%  { transform: translate3d(-43px,9px,0) rotateZ(-17deg) rotateX(8deg) rotateY(-12deg) scale(1.06); }
+    84%  { transform: translate3d(30px,-6px,0) rotateZ(12deg) rotateX(-6deg) rotateY(8deg) scale(1.04); }
+    90%  { transform: translate3d(-18px,4px,0) rotateZ(-7deg) rotateX(4deg) rotateY(-5deg) scale(1.02); }
+    96%  { transform: translate3d(7px,-1px,0) rotateZ(3deg) rotateX(-1deg) rotateY(2deg) scale(1.01); }
+    100% { transform: translate3d(0,0,0) rotateZ(0deg) rotateX(0deg) rotateY(0deg) scale(1); }
+  }
+
+  .ball-stage:hover .ball:not(.shaking) {
+    transform: translateY(-5px) scale(1.01);
+  }
+
+  .instructions {
+    color: #777784;
+    font-size: 12px;
+    margin-top: -4px;
+    margin-bottom: 24px;
+  }
+
+  .panel {
+    width: min(680px, 100%);
+    background: rgba(17,17,24,.78);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
+    padding: 18px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  }
+
+  label {
+    display: block;
+    color: #aaaab7;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 0 8px 4px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 76px;
+    resize: vertical;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    outline: none;
+    background: #0a0a0f;
+    color: white;
+    padding: 16px;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  textarea::placeholder { color: #5f5f6b; }
+
+  textarea:focus {
+    border-color: rgba(155,124,255,.7);
+    box-shadow: 0 0 0 4px rgba(155,124,255,.1);
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  button {
+    border: 0;
+    border-radius: 14px;
+    padding: 15px 16px;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .15s ease, filter .15s ease, background .15s ease;
+  }
+
+  button:active { transform: scale(.97); }
+
+  .shake-btn {
+    color: #09090c;
+    background: linear-gradient(135deg, #e4dcff, #9677ff);
+  }
+
+  .shake-btn:hover { filter: brightness(1.08); }
+
+  .again-btn {
+    color: #e8e8ef;
+    background: #24242d;
+  }
+
+  .again-btn:hover { background: #2c2c37; }
+
+  .status {
+    min-height: 20px;
+    margin-top: 12px;
+    text-align: center;
+    color: #777784;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .history {
+    width: min(680px, 100%);
+    margin-top: 18px;
+  }
+
+  .history-title {
+    color: #686875;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin: 0 0 8px 4px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .history-item {
+    border: 1px solid rgba(255,255,255,.05);
+    background: rgba(255,255,255,.025);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .history-q {
+    color: #8b8b97;
+    font-size: 12px;
+  }
+
+  .history-a {
+    margin-top: 3px;
+    color: #e8e8ef;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 38px;
+    color: #4d4d58;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .salene-home-link { display: inline-block; margin-top: 12px; padding: 8px 11px; border: 2px solid #293c3b; border-radius: 999px; background: #fffdf7; color: #293c3b; box-shadow: 2px 2px 0 #293c3b; font: 10px "DM Mono", monospace; text-decoration: none; }
+  .salene-home-link:hover, .salene-home-link:focus-visible { background: #ffe477; text-decoration: none; outline: 2px solid #293c3b; outline-offset: 2px; }
+
+  @media (max-width: 560px) {
+    .answer {
+      top: 43%;
+      left: 22%;
+      width: 56%;
+      height: 29%;
+      font-size: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+
+  .fog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 124%;
+    height: 124%;
+    margin: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: .22;
+    filter: blur(25px);
+    background: radial-gradient(ellipse at center, rgba(183,158,255,.5) 0%, rgba(120,90,190,.2) 34%, transparent 68%);
+    mix-blend-mode: screen;
+    transform-origin: 50% 50%;
+    z-index: 1;
+  }
+
+  .fog-a {
+    transform: translate(-50%, -50%) rotate(-20deg) scale(1.12, .72);
+    animation: fogSwirlA 9s ease-in-out infinite;
+  }
+
+  .fog-b {
+    transform: translate(-50%, -50%) rotate(35deg) scale(.82, 1.12);
+    opacity: .16;
+    animation: fogSwirlB 11s ease-in-out infinite reverse;
+  }
+
+  .fog-c {
+    transform: translate(-50%, -50%) rotate(70deg) scale(1.18, .62);
+    opacity: .12;
+    animation: fogSwirlC 13s ease-in-out infinite;
+  }
+
+  @keyframes fogSwirlA {
+    0%, 100% {
+      transform: translate(-50%, -50%) rotate(-20deg) scale(1.12, .72);
+    }
+    50% {
+      transform: translate(-50%, -50%) rotate(20deg) scale(1.22, .82);
+    }
+  }
+
+  @keyframes fogSwirlB {
+    0%, 100% {
+      transform: translate(-50%, -50%) rotate(35deg) scale(.82, 1.12);
+    }
+    50% {
+      transform: translate(-50%, -50%) rotate(-35deg) scale(.92, 1.22);
+    }
+  }
+
+  @keyframes fogSwirlC {
+    0%, 100% {
+      transform: translate(-50%, -50%) rotate(-25deg) scale(1.18, .62);
+    }
+    50% {
+      transform: translate(-50%, -50%) rotate(25deg) scale(1.28, .7);
+    }
+  }
+
+  .ball-stage.active .fog {
+    opacity: .9;
+    filter: blur(14px);
+    transform-origin: 50% 50%;
+    z-index: 0;
+  }
+
+  .ball-stage {
+    outline: none;
+  }
+
+  .tap-prompt {
+    margin-top: -7px;
+    color: #d6c9ff;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .18em;
+    text-align: center;
+    text-transform: uppercase;
+    transition: opacity .25s, transform .25s;
+  }
+
+  .status {
+    min-height: 20px;
+    margin-top: 10px;
+    color: #696976;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 36px;
+    color: #454550;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .ball-stage.impact {
+    animation: stageImpact .22s ease-in-out 3;
+  }
+
+  @keyframes stageImpact {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+
+  .shadow-surge {
+    z-index: 0;
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    width: 28%;
+    height: 5%;
+    border-radius: 50%;
+    background: rgba(0,0,0,.62);
+    filter: blur(9px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ball-stage.active .shadow-surge {
+    opacity: .8;
+    animation: surgeShadow 1.35s ease both;
+  }
+
+  @keyframes surgeShadow {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    8% { transform: translateX(-180%) scale(.65); }
+    16% { transform: translateX(90%) scale(1.35); }
+    24% { transform: translateX(-210%) scale(.5); }
+    32% { transform: translateX(110%) scale(1.5); }
+    40% { transform: translateX(-190%) scale(.48); }
+    48% { transform: translateX(120%) scale(1.55); }
+    56% { transform: translateX(-170%) scale(.58); }
+    64% { transform: translateX(90%) scale(1.35); }
+    74% { transform: translateX(-105%) scale(.75); }
+    84% { transform: translateX(60%) scale(1.18); }
+    94% { transform: translateX(-20%) scale(.95); }
+  }
+
+
+  .energy-ring {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    width: 86%;
+    aspect-ratio: 1;
+    border: 2px solid rgba(190,165,255,.45);
+    border-radius: 50%;
+    transform: translate(-50%,-50%) scale(.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ring-one { border-style: solid; }
+  .ring-two { width: 104%; border: 2px dashed rgba(215,195,255,.38); }
+
+  .ball-stage.active .ring-one {
+    animation: energyRing 1.35s ease-out both;
+  }
+
+  .ball-stage.active .ring-two {
+    animation: energyRing 1.35s .08s ease-out both, ringSpin 1.35s linear both;
+  }
+
+  @keyframes energyRing {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.65); }
+    18% { opacity: .65; }
+    70% { opacity: .22; }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.35); }
+  }
+
+  @keyframes ringSpin {
+    from { rotate: 0deg; }
+    to { rotate: 220deg; }
+  }
+
+  .spark-field {
+    position: absolute;
+    z-index: 4;
+    inset: 8%;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .spark-field i {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(225,214,255,.9);
+    box-shadow: 0 0 10px rgba(185,155,255,.8);
+    opacity: 0;
+  }
+
+  .spark-field i:nth-child(1) { --sx: -35px; --sy: -10px; left: 12%; top: 42%; }
+  .spark-field i:nth-child(2) { --sx: -24px; --sy: -32px; left: 22%; top: 19%; }
+  .spark-field i:nth-child(3) { --sx: -4px; --sy: -42px; left: 39%; top: 8%; }
+  .spark-field i:nth-child(4) { --sx: 28px; --sy: -30px; left: 68%; top: 14%; }
+  .spark-field i:nth-child(5) { --sx: 40px; --sy: -8px; left: 84%; top: 34%; }
+  .spark-field i:nth-child(6) { --sx: 42px; --sy: 18px; left: 89%; top: 61%; }
+  .spark-field i:nth-child(7) { --sx: 28px; --sy: 34px; left: 72%; top: 83%; }
+  .spark-field i:nth-child(8) { --sx: 5px; --sy: 42px; left: 51%; top: 91%; }
+  .spark-field i:nth-child(9) { --sx: -28px; --sy: 34px; left: 27%; top: 82%; }
+  .spark-field i:nth-child(10) { --sx: -42px; --sy: 16px; left: 10%; top: 66%; }
+  .spark-field i:nth-child(11) { --sx: -28px; --sy: -8px; left: 31%; top: 35%; }
+  .spark-field i:nth-child(12) { --sx: 31px; --sy: 7px; left: 73%; top: 48%; }
+
+  .ball-stage.active .spark-field i {
+    animation: sparks 1.15s ease-out both;
+  }
+
+  .ball-stage.active .spark-field i:nth-child(2n) { animation-delay: .08s; }
+  .ball-stage.active .spark-field i:nth-child(3n) { animation-delay: .16s; }
+  .ball-stage.active .spark-field i:nth-child(5n) { animation-delay: .24s; }
+
+  @keyframes sparks {
+    0% { opacity: 0; transform: scale(.2) translate(0,0); }
+    18% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.8) translate(var(--sx, 0), var(--sy, -18px)); }
+  }
+
+
+  .ball-stage.flash::before {
+    content: "";
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    background: rgba(220,205,255,.22);
+    filter: blur(30px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  .ball-stage.active.flash::before {
+    animation: oracleFlash .12s ease-out both;
+  }
+
+  @keyframes oracleFlash {
+    0% { opacity: 0; transform: scale(.7); }
+    40% { opacity: .75; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.3); }
+  }
+
+  .ball-stage.active .ball-glow {
+    animation: glowPulse 1.35s ease-in-out both, glowFlicker 1.35s linear both;
+  }
+
+  @keyframes glowFlicker {
+    0%, 100% { filter: blur(50px); }
+    18% { filter: blur(32px); }
+    24% { filter: blur(58px); }
+    42% { filter: blur(28px); }
+    58% { filter: blur(55px); }
+    76% { filter: blur(34px); }
+  }
+
+
+  @media (min-width: 561px) {
+    .ball-stage {
+      width: min(560px, 76vw);
+    }
+
+    .ball {
+      width: 68%;
+    }
+
+    .ball-stage.active .fog {
+      opacity: .9;
+    }
+
+    .ball-stage.active .energy-ring {
+      animation-duration: 1.35s;
+    }
+
+    .ball-stage.active .spark-field i {
+      animation-duration: 1.35s;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .answer {
+      top: 44%;
+      left: 18%;
+      width: 64%;
+      height: 29%;
+      font-size: clamp(10px, 3vw, 15px);
+    }
+
+    .answer.long {
+      font-size: clamp(7.5px, 2.7vw, 11px);
+    }
+
+    .answer.very-long {
+      font-size: clamp(5.8px, 2.1vw, 8.5px);
+    }
+  }
+  h1 { font-family: Fraunces, Georgia, serif; letter-spacing: -.07em; }
+  .eyebrow, .tagline, .tap-prompt, .status, .footer { font-family: "DM Mono", monospace; }
+  .fog{opacity:.34;filter:blur(32px);background:radial-gradient(ellipse at 30% 40%,rgba(238,221,255,.7) 0%,rgba(158,104,255,.38) 28%,rgba(73,38,133,.18) 54%,transparent 72%);}
+  .fog-b{opacity:.24;mix-blend-mode:color-dodge}.fog-c{opacity:.2;background:radial-gradient(ellipse at 70% 62%,rgba(111,235,255,.28),rgba(132,69,231,.26) 36%,transparent 70%)}
+  .ball-stage.active .fog{opacity:1;filter:blur(19px)}
+
+  /* A night edition: paper typography around the original oracle. */
+  :root { --bg: #151413; --text: #f0e9dc; --muted: #b3aa9c; --accent2: #d5a083; }
+  html, body { background: var(--bg); }
+  .app { overflow-x: clip; }
+  h1 { font-family: Georgia, serif; font-weight: 400; letter-spacing: -.055em; line-height: 1.04; }
+  .eyebrow { margin-top: 14px; font-size: 10px; font-weight: 400; letter-spacing: .14em; }
+  .tagline { font-family: Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.45; }
+  .tap-prompt { color: #d5a083; font-weight: 400; font-size: 11px; letter-spacing: .14em; }
+  .status, .footer { color: #b3aa9c; font-weight: 400; }
+  .salene-home-link { min-height: 44px; display: inline-flex; align-items: center; background: none; color: #d5a083; border: 0; border-radius: 0; box-shadow: none; padding: 8px 0; }
+  .salene-home-link:hover, .salene-home-link:focus-visible { background: none; color: #f0e9dc; text-decoration: underline; outline-color: #d5a083; }
+  .ball-stage:focus-visible { outline: 1px solid #d5a083; outline-offset: -16px; }
+</style>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'self'">
+<meta name="theme-color" content="#151413">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Unhinged">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="stylesheet" href="./halloween.css">
+</head>
+<body>
+<main class="app">
+  <section class="ball-stage" id="ballStage" role="button" tabindex="0" aria-label="Tap the 8 Ball">
+    <div class="fog fog-a"></div>
+    <div class="fog fog-b"></div>
+    <div class="fog fog-c"></div>
+    <div class="ball-glow"></div>
+    <div class="energy-ring ring-one"></div>
+    <div class="energy-ring ring-two"></div>
+    <div class="spark-field" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="shadow-surge"></div>
+
+    <div class="ball" id="ball">
+      <div class="window">
+        <div class="ball-number" aria-hidden="true">8</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="answer" id="answer" role="status" aria-live="polite"></div>
+  <div class="tap-prompt" id="tapPrompt">Shake or tap</div>
+  <div class="status" id="status" hidden></div>
+  <button class="settings-toggle" id="settingsButton" aria-label="Open settings" aria-haspopup="dialog"><svg aria-hidden="true" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m10 3-.6 2.2-2 .9-2-.7-2 3.4 1.6 1.6v2.3L3.4 14l2 3.4 2-.7 2 .9.6 2.2h4l.6-2.2 2-.9 2 .7 2-3.4-1.6-1.6v-2.3l1.6-1.6-2-3.4-2 .7-2-.9L14 3z"/><circle cx="12" cy="11.4" r="3"/></svg></button>
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+  <div class="settings-heading"><h2 id="settingsTitle">Settings</h2><button id="closeSettings" aria-label="Close settings">×</button></div>
+  <div class="controls" aria-label="Party controls">
+    <button id="motionButton">Enable shake</button>
+    <button id="soundButton" aria-pressed="false">Sound off</button>
+    <button id="voiceButton" aria-pressed="false" disabled>Your voice off</button>
+    <button id="smokeButton" aria-pressed="true">Smoke on</button>
+  </div>
+  <div class="audio-tests"><button id="testSound">Test sound</button><button id="testVoice" disabled>Test your voice</button></div>
+  <button id="importVoice" class="import-voice">Import my recordings</button>
+  <input id="voiceFile" type="file" accept=".json,application/json" hidden>
+  <p id="voiceStatus" class="help" role="status">Checking this device for recordings…</p>
+  <p id="audioStatus" class="help" role="status">Use the test buttons to check playback and your media volume.</p>
+  <p id="motionStatus" class="help" role="status">Tap the ball anytime. Enable shake to use your phone’s motion.</p>
+  <p id="offlineStatus" class="help" role="status">Preparing offline copy…</p>
+  <details class="setup"><summary>Set up for Halloween</summary>
+    <p>Open this HTTPS page in Safari, use Share → Add to Home Screen, then open the new app while online. Wait for “Offline copy ready”. Import your voice pack below, then turn on airplane mode, fully close the app, and reopen it from its icon to test.</p>
+    <p>After adding the app to your Home Screen, open it from that icon. In Settings, tap Import my recordings and choose My-8-Ball-Voice.eightball.json from Files. All clips import together and stay on this device.</p>
+    <p>Turn Your voice on, test an answer, then test again in airplane mode. Voice mode uses your imported answers. With voice off, all 69 text answers are available.</p>
+    <p>Keep the voice pack in Files. Clearing website data or iPhone storage cleanup can remove imported recordings; import the pack again if needed.</p>
+    <p>Check the app online before Halloween. iPhone storage cleanup can remove saved website data.</p>
+  </details>
+  </dialog>
+
+</main>
+
+<script>
+const answers = [
+  "GIRL. STAND UP.",
+  "BE FUCKING SERIOUS.",
+  "YOU KNOW DAMN WELL.",
+  "I'M NOT ENABLING THIS.",
+  "ABSOLUTELY NOT.",
+  "THAT'S BETWEEN YOU AND GOD.",
+  "ASK YOUR THERAPIST.",
+  "I'M AN ORACLE, NOT A MIRACLE WORKER.",
+  "NO ❤️",
+  "I HAVE CONCERNS.",
+  "YOU'RE ABOUT TO LEARN THE HARD WAY.",
+  "CHARACTER DEVELOPMENT INCOMING.",
+  "THAT SOUNDS LIKE A TERRIBLE IDEA.",
+  "I'M GOING TO PRETEND YOU DIDN'T ASK THAT.",
+  "RESPECTFULLY, WHAT THE FUCK?",
+  "YOU'RE BETTER THAN THIS.",
+  "BECAUSE APPARENTLY WE HAVE TO LEARN EVERYTHING THE HARD WAY.",
+  "YOU'RE ASKING THE WRONG BALL.",
+  "THIS IS A 2 A.M. DECISION AND IT SHOWS.",
+  "SLEEP ON IT.",
+  "WAIT 24 HOURS.",
+  "YOU'RE IN YOUR DELULU ERA.",
+  "I SUPPORT THE DELUSION.",
+  "HONESTLY? SEND IT.",
+  "I'M NOT SIGNING OFF ON THIS.",
+  "YOU'RE GOING TO DO IT ANYWAY, AREN'T YOU?",
+  "FINE. FUCK IT.",
+  "MAY GOD BE WITH YOU.",
+  "GIRL WHAT.",
+  "I HAVE QUESTIONS TOO.",
+  "WE BOTH KNOW THE ANSWER.",
+  "I WOULD NOT TELL MY WORST ENEMY TO DO THIS.",
+  "ABSOLUTELY NOT, NEXT.",
+  "YOU'RE FREE TO IGNORE ME. YOU WON'T.",
+  "DO IT. I WANT TO SEE WHAT HAPPENS.",
+  "NOT THE MOVE.",
+  "WHAT COULD POSSIBLY GO WRONG?",
+  "LIFE IS SHORT. MAKE QUESTIONABLE CHOICES.",
+  "YOLO",
+  "FUCK IT, WE BALL.",
+  "SEND IT.",
+  "I'M NOT YOUR MOM.",
+  "ABSOLUTELY UNHINGED. APPROVED.",
+  "I'M NOT SAYING YES. I'M ALSO NOT SAYING NO. GOOD LUCK.",
+  "THE VIBES ARE QUESTIONABLE.",
+  "THIS IS A TERRIBLE IDEA. I LOVE IT.",
+  "YOU'RE GONNA HAVE A STORY TO TELL.",
+  "YOU ALREADY KNOW WHAT YOU SHOULD DO.",
+  "I REFUSE TO PARTICIPATE.",
+  "YOU'RE ON YOUR OWN, SOLDIER.",
+  "I BELIEVE IN YOU. UNFORTUNATELY.",
+  "EMOTIONALLY? YES. LOGICALLY? ABSOLUTELY NOT.",
+  "MY SOURCES SAY: GIRL, NO.",
+  "I RESPECT THE AUDACITY.",
+  "HONESTLY? ICONIC.",
+  "THIS IS HOW THE PLOT THICKENS.",
+  "CHARACTER DEVELOPMENT HAS ENTERED THE CHAT.",
+  "YOU'RE GONNA DO IT. I'M JUST HERE FOR THE CONSEQUENCES.",
+  "I HAVE SEEN THE FUTURE. IT'S MESSY.",
+  "ERROR: TOO UNHINGED TO ANSWER.",
+  "THE BALL IS JUDGING YOU SILENTLY.",
+  "YES. MAKE IT EVERYONE'S PROBLEM",
+  "DO IT FOR THE PLOT",
+  "A RED FLAG IS STILL A FLAG",
+  "WHY DID YOU ASK ME THAT?",
+  "WHAT'S WRONG WITH YOU?",
+  "DO YOU NEED HELP?",
+  "FUCK NO.",
+  "DO I KNOW YOU?"
+];
+
+const rareAnswers = [];
+
+const ball = document.getElementById("ball");
+const stage = document.getElementById("ballStage");
+const answer = document.getElementById("answer");
+const glow = document.querySelector(".ball-glow");
+const prompt = document.getElementById("tapPrompt");
+const status = document.getElementById("status");
+
+let shaking = false;
+let lastIndex = -1;
+let lastAnswer = null;
+
+function fitAnswer() {
+  let size = Math.min(44, Math.max(30, window.innerWidth * .085));
+  answer.style.fontSize = size + 'px';
+  if (!answer.textContent) return;
+  const range = document.createRange();
+  range.selectNodeContents(answer);
+  while (size > 22 && range.getBoundingClientRect().height > answer.clientHeight - 24) {
+    size -= .5;
+    answer.style.fontSize = size + 'px';
+  }
+}
+
+function pickAnswer() {
+  const useRare = rareAnswers.length > 0 && Math.random() < 0.08;
+  const fullPool = useRare ? rareAnswers : answers;
+  const pool = voiceEnabled ? fullPool.filter(text => importedAnswers.has(text)) : fullPool;
+
+  let result;
+  do {
+    result = pool[Math.floor(Math.random() * pool.length)];
+  } while (pool.length > 1 && result === lastAnswer);
+
+  lastAnswer = result;
+  return result;
+}
+
+
+// ---------- UNHINGED SOUND ENGINE ----------
+let audioCtx = null;
+let effectsBus = null;
+
+function getAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+// Louder effects mix with compression to control combined peaks.
+function getAudioOutput() {
+  if (effectsBus) return effectsBus;
+  const ctx = getAudio();
+  effectsBus = ctx.createGain();
+  effectsBus.gain.value = 4;
+  const compressor = ctx.createDynamicsCompressor();
+  compressor.threshold.value = -10;
+  compressor.knee.value = 8;
+  compressor.ratio.value = 12;
+  compressor.attack.value = .003;
+  compressor.release.value = .12;
+  const output = ctx.createGain();
+  output.gain.value = .85;
+  effectsBus.connect(compressor);
+  compressor.connect(output);
+  output.connect(ctx.destination);
+  return effectsBus;
+}
+
+function noiseBurst(duration, volume, filterFreq, type = "bandpass") {
+  const ctx = getAudio();
+  const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.8);
+  }
+
+  const source = ctx.createBufferSource();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+
+  filter.type = type;
+  filter.frequency.value = filterFreq;
+  filter.Q.value = 1.2;
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + duration);
+
+  source.buffer = buffer;
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(getAudioOutput());
+  source.start();
+}
+
+function thump() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Short plastic knock, not a bass hit.
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(210, now);
+  osc.frequency.exponentialRampToValueAtTime(105, now + .07);
+
+  filter.type = "bandpass";
+  filter.frequency.value = 620;
+  filter.Q.value = 3;
+
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.13, now + .006);
+  gain.gain.exponentialRampToValueAtTime(.001, now + .085);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(getAudioOutput());
+  osc.start(now);
+  osc.stop(now + .09);
+}
+
+function shakeSound() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Bright, irregular plastic clicks. These should sound like the ball
+  // physically rattling, rather than a low electronic buzz.
+  for (let i = 0; i < 17; i++) {
+    const t = now + i * .062 + Math.random() * .025;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc.type = i % 3 === 0 ? "square" : "triangle";
+    const base = 420 + Math.random() * 520;
+    osc.frequency.setValueAtTime(base, t);
+    osc.frequency.exponentialRampToValueAtTime(base * .55, t + .035);
+
+    filter.type = "bandpass";
+    filter.frequency.value = 850 + Math.random() * 900;
+    filter.Q.value = 2.5;
+
+    gain.gain.setValueAtTime(.0001, t);
+    gain.gain.exponentialRampToValueAtTime(.035 + Math.random() * .035, t + .004);
+    gain.gain.exponentialRampToValueAtTime(.0001, t + .045);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(getAudioOutput());
+    osc.start(t);
+    osc.stop(t + .05);
+  }
+
+  // Very light high-passed air underneath the clicks.
+  noiseBurst(.9, .018, 1800, "highpass");
+}
+
+function whoosh() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Airy upward sweep with no sub-bass.
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(260, now);
+  osc.frequency.exponentialRampToValueAtTime(1050, now + .48);
+
+  filter.type = "highpass";
+  filter.frequency.setValueAtTime(350, now);
+  filter.frequency.exponentialRampToValueAtTime(900, now + .48);
+
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.045, now + .12);
+  gain.gain.exponentialRampToValueAtTime(.001, now + .55);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(getAudioOutput());
+  osc.start(now);
+  osc.stop(now + .57);
+
+  noiseBurst(.5, .012, 2200, "highpass");
+}
+
+function revealSound() {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+
+  // Two soft tones for the "oracle speaks" moment.
+  [261.63, 392.00].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(.0001, now + i * .055);
+    gain.gain.exponentialRampToValueAtTime(.09, now + i * .055 + .025);
+    gain.gain.exponentialRampToValueAtTime(.001, now + i * .055 + .55);
+
+    osc.connect(gain);
+    gain.connect(getAudioOutput());
+    osc.start(now + i * .055);
+    osc.stop(now + i * .055 + .58);
+  });
+}
+
+
+function shake() {
+  if (shaking) return;
+  shaking = true;
+  stopVoice();
+
+  // Unlock audio from the user's tap and start the physical sequence.
+  playEffect(() => { getAudio(); thump(); shakeSound(); });
+
+  prompt.hidden = true;
+  status.textContent = "FUCK IT, WE BALL.";
+
+  setTimeout(() => { status.textContent = "OH, YOU WANT AN ANSWER?"; }, 280);
+  setTimeout(() => { status.textContent = "HOLD ON."; }, 620);
+  setTimeout(() => { status.textContent = "CHAOS IN PROGRESS."; }, 920);
+
+  answer.classList.remove("reveal", "long", "very-long");
+  answer.style.opacity = "0";
+  glow.classList.remove("pulse");
+  // Reset the fog state so every click gives desktop users a fresh visible gust.
+  stage.classList.remove("active");
+  void stage.offsetWidth;
+  stage.classList.add("active");
+  ball.classList.remove("shaking");
+  stage.classList.remove("flash");
+  void ball.offsetWidth;
+  void glow.offsetWidth;
+  ball.classList.add("shaking");
+  glow.classList.add("pulse");
+
+  setTimeout(() => {
+    playEffect(whoosh);
+    stage.classList.add("flash");
+    setTimeout(() => stage.classList.remove("flash"), 160);
+  }, 260);
+
+  setTimeout(() => {
+    stage.classList.add("flash");
+    setTimeout(() => stage.classList.remove("flash"), 160);
+  }, 650);
+
+  setTimeout(() => {
+    stage.classList.add("impact");
+    setTimeout(() => stage.classList.remove("impact"), 700);
+  }, 220);
+
+  setTimeout(() => {
+    const result = pickAnswer();
+    answer.textContent = result;
+    speakFortune(result);
+    playEffect(revealSound);
+    fitAnswer();
+    requestAnimationFrame(() => {
+      fitAnswer();
+      answer.style.opacity = "1";
+      answer.classList.add("reveal");
+    });
+    prompt.textContent = "";
+    status.textContent = "";
+
+    setTimeout(() => {
+      ball.classList.remove("shaking");
+      stage.classList.remove("active");
+      shaking = false;
+    }, 250);
+  }, 1350);
+}
+
+window.addEventListener("resize", () => {
+  if (answer.textContent !== "8") fitAnswer();
+});
+
+stage.addEventListener("click", shake);
+stage.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    shake();
+  }
+});
+</script>
+<script src="./voice-store.js"></script>
+<script src="./pwa.js"></script>
+</body>
+</html>
